@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rock Rangers: The Great Rock Crew Quest</title>
+<style>
+:root{--g:#2E5D34;--bg:#FFF8E7;--ig:#E8590C;--se:#C99A2E;--me:#7B4FB3;--ink:#222}
+@media(prefers-color-scheme:dark){:root{--bg:#1d2a1f;--ink:#f3f0e6}.card{background:#2a3a2c!important;color:var(--ink)}.chip{background:#33463a!important;color:var(--ink)!important}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--g);color:#fff;padding:14px 16px;font-weight:800;font-size:1.15rem}
+main{max-width:640px;margin:0 auto;padding:14px}
+.card{background:#fff;border:3px solid var(--g);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+h2{margin:.2em 0 .4em;color:var(--g)}@media(prefers-color-scheme:dark){h2{color:#9bd3a2}}
+.rock{font-size:64px;text-align:center}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.fam{flex:1;min-width:150px;border:3px solid;border-radius:14px;background:transparent;color:inherit;padding:8px;text-align:center;font-weight:700;cursor:pointer;font-size:.95rem}
+.fam.on{color:#fff}
+.chip{border:2px solid var(--g);background:#eef6ee;color:#222;border-radius:999px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:1rem}
+.chip.on{background:var(--g)!important;color:#fff!important}
+.btn{background:var(--g);color:#fff;border:0;border-radius:12px;padding:13px 20px;font-size:1.05rem;font-weight:800;cursor:pointer;width:100%;margin-top:10px}
+.btn:disabled{opacity:.4}.big{font-size:2.4rem;text-align:center;font-weight:800;color:var(--g)}
+.ok{color:#1a7f37;font-weight:800}.no{color:#b3261e;font-weight:800}
+.frame{background:rgba(46,93,52,.12);border-radius:10px;padding:10px;margin:8px 0;font-style:italic}
+.prog{height:10px;background:rgba(0,0,0,.15);border-radius:6px;overflow:hidden;margin-bottom:12px}.prog i{display:block;height:100%;background:var(--ig)}
+small{opacity:.75}
+</style></head><body>
+<header>ROCK RANGERS: The Great Rock Crew Quest</header>
+<main id="app"></main>
+<script>
+const COL={Igneous:'#E8590C',Sedimentary:'#C99A2E',Metamorphic:'#7B4FB3'};
+const GUIDE={Igneous:['Igna the Lava Lizard','Born in fire, cooled by time!','Wiggle your fingers upward like flames.'],Sedimentary:['Sedi the River Turtle','Layer by layer, I deliver!','Stack your hands layer by layer.'],Metamorphic:['Meta the Mole','Heat and pressure, change forever!','Squeeze your fists together.']};
+const BANK=['Granite','Pumice','Basalt','Sandstone','Limestone','Shale','Marble','Slate'];
+const CARDS=[
+{t:'The Crystal Mystery',c:'Big, visible crystals in pink, gray and black. Very hard. Cooled slowly deep underground.',r:'Granite',f:'Igneous',x:'Slow cooling underground lets big crystals grow.'},
+{t:'The Floating Rock',c:'Light and full of tiny holes. Cooled fast from lava. It can float on water!',r:'Pumice',f:'Igneous',x:'Gas bubbles trapped in fast-cooling lava make it light enough to float.'},
+{t:'The Beach Rock',c:'Feels gritty like a beach. Made of squeezed sand grains stacked in layers.',r:'Sandstone',f:'Sedimentary',x:'Sand grains pressed and cemented together over a very long time.'},
+{t:'The Shell Rock',c:'Often has shell bits or fossils inside. Fizzes with weak acid.',r:'Limestone',f:'Sedimentary',x:'Built from shells and tiny sea creatures that settled on the sea floor.'},
+{t:'The Sparkle Rock',c:'Shiny, sparkly crystals and no layers. It was once another rock, then baked and squeezed.',r:'Marble',f:'Metamorphic',x:'Limestone baked and squeezed into sparkling, interlocking crystals.'},
+{t:'The Page Rock',c:'Flat, smooth sheets that split like pages. It was once mud, then squeezed.',r:'Slate',f:'Metamorphic',x:'Mud and shale squeezed by pressure so it splits into flat sheets.'}];
+const face=(c,s=60)=>`<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="${c}"/><circle cx="22" cy="26" r="7" fill="#fff"/><circle cx="42" cy="26" r="7" fill="#fff"/><circle cx="22" cy="27" r="3"/><circle cx="42" cy="27" r="3"/><path d="M20 40Q32 52 44 40" stroke="#000" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`;
+let S={p:'intro',i:0,pf:[],pr:[],f:null,r:null,rv:0,t:45,iv:null,pi:null};
+const A=document.getElementById('app');
+const go=p=>{S.p=p;render();scrollTo(0,0)};
+const fams=Object.keys(COL);
+function guides(){return `<div class="row">${fams.map(f=>`<div class="card" style="flex:1;min-width:150px;border-color:${COL[f]};text-align:center">${face(COL[f],64)}<b style="color:${COL[f]}">${GUIDE[f][0]}</b><br>${f} rocks<br><small>"${GUIDE[f][1]}"</small></div>`).join('')}</div>`}
+function render(){
+ if(S.p=='intro'){A.innerHTML=`<div class="card"><h2>Meet your guides</h2>${guides()}
+ <p>Read each clue card, pick the rock family and the rock name, then lock it in. <b>No answers until the end!</b> Then you will pitch one rock out loud before the big reveal.</p>
+ <p><small>Play in your team of 4. Share one device, or use the paper kit.</small></p>
+ <button class="btn" onclick="go('play')">Start Clue Hunt</button></div>`}
+ if(S.p=='play'){const c=CARDS[S.i];
+ A.innerHTML=`<div class="prog"><i style="width:${S.i/6*100}%"></i></div>
+ <div class="card"><small>Rock Card #${S.i+1} of 6</small><div class="rock">🪨</div><h2>${c.t}</h2><p style="font-size:1.1rem">${c.c}</p></div>
+ <div class="card"><b>1. Which family?</b><div class="row" style="margin-top:8px">${fams.map(f=>`<button class="fam ${S.f==f?'on':''}" style="border-color:${COL[f]};${S.f==f?'background:'+COL[f]:''}" onclick="S.f='${f}';render()">${face(COL[f],38)}<br>${f}</button>`).join('')}</div>
+ <p><b>2. Which rock?</b></p><div class="row">${BANK.map(r=>`<button class="chip ${S.r==r?'on':''}" onclick="S.r='${r}';render()">${r}</button>`).join('')}</div>
+ <button class="btn" ${S.f&&S.r?'':'disabled'} onclick="lock()">Lock in answer</button></div>`}
+ if(S.p=='speak'){A.innerHTML=`<div class="card"><h2>Rock Pitch: speak up!</h2><p>Choose ONE card. Your Speaker has 45 seconds to convince a neighbor team.</p>
+ <div class="row">${CARDS.map((c,i)=>`<button class="chip ${S.pi===i?'on':''}" onclick="pick(${i})">Card #${i+1}</button>`).join('')}</div>
+ ${S.pi!==null?`<div class="frame">"We believe Rock #${S.pi+1} is <b>${S.pr[S.pi]}</b> because the clue says ______."</div><div class="frame">"It formed when ______."</div><div class="frame">"It belongs to ${GUIDE[S.pf[S.pi]][0].split(' ')[0]}'s family, the ${S.pf[S.pi]} rocks."</div>
+ <div class="big" id="tm">${S.t}</div><button class="btn" onclick="timer()">Start 45-second pitch</button>`:''}
+ <button class="btn" style="background:var(--ig)" onclick="clearInterval(S.iv);S.rv=0;go('rev')">Ready for the reveal</button></div>`}
+ if(S.p=='rev'){const c=CARDS[S.rv],ok=S.pr[S.rv]==c.r,fk=S.pf[S.rv]==c.f,g=GUIDE[c.f];
+ A.innerHTML=`<div class="card" style="border-color:${COL[c.f]}"><small>Reveal ${S.rv+1} of 6</small><h2>${c.t}</h2><div style="text-align:center">${face(COL[c.f],80)}</div>
+ <div class="big" style="color:${COL[c.f]}">${c.r}</div><p style="text-align:center"><b>${c.f}</b> - guide: ${g[0]}</p><p>${c.x}</p>
+ <p>Your answer: <b>${S.pr[S.rv]}</b> <span class="${ok?'ok':'no'}">${ok?'✓':'✗'}</span> / <b>${S.pf[S.rv]}</b> <span class="${fk?'ok':'no'}">${fk?'✓':'✗'}</span></p>
+ <div class="frame">Echo it! Say "<b>${c.r}</b>" out loud, then: ${g[2]}<br>"${g[1]}"</div>
+ <button class="btn" onclick="S.rv<5?(S.rv++,render()):go('end')">${S.rv<5?'Next rock':'See my score'}</button></div>`}
+ if(S.p=='end'){let n=0;CARDS.forEach((c,i)=>{n+=(S.pr[i]==c.r)+(S.pf[i]==c.f)});
+ const b=n>=10?'Gold Ranger':n>=7?'Silver Ranger':n>=4?'Bronze Ranger':'Trainee Ranger';
+ A.innerHTML=`<div class="card" style="text-align:center"><h2>Quest complete!</h2><div class="rock">🏅</div><div class="big">${n} / 12</div><h2>${b}</h2>
+ <p>Now add your Speaking (8) and Teamwork (4) points on your paper answer slip. Total possible: 30.</p>
+ <p>Exit ticket: <i>Today I learned that ______ rocks form when ______.</i></p>
+ <button class="btn" onclick="reset()">Play again</button></div>`}
+}
+function lock(){S.pf[S.i]=S.f;S.pr[S.i]=S.r;S.f=S.r=null;S.i<5?(S.i++,render()):go('speak')}
+function pick(i){S.pi=i;S.t=45;clearInterval(S.iv);render()}
+function timer(){clearInterval(S.iv);S.t=45;S.iv=setInterval(()=>{S.t--;const e=document.getElementById('tm');if(e)e.textContent=S.t>0?S.t:'Time!';if(S.t<=0)clearInterval(S.iv)},1000)}
+function reset(){S={p:'intro',i:0,pf:[],pr:[],f:null,r:null,rv:0,t:45,iv:null,pi:null};render()}
+render();
+</script></body></html>
